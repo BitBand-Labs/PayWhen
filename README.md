@@ -9,8 +9,6 @@
 [![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-**[Live Miniapp](https://paywhen.vercel.app) · [GitHub](https://github.com/BitBand-Labs/PayWhen)**
-
 </div>
 
 ---
