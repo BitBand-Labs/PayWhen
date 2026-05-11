@@ -1,233 +1,209 @@
-# IntentRemit 🚀
+# PayWhen — Intent-Based Payment Protocol on Stellar
 
-> **Programmable Remittance with Purpose on Stellar** — Turn diaspora remittances into structured financial growth.
+<div align="center">
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Built on Stellar](https://img.shields.io/badge/Built%20on-Stellar-purple)](https://stellar.org)
+![PayWhen](https://img.shields.io/badge/PayWhen-Protocol-8FA828?style=for-the-badge&logo=stellar&logoColor=white)
 
-## 🧠 Overview
+[![Network](https://img.shields.io/badge/Stellar-Network-7d32a8?style=flat-square&logo=stellar)](https://stellar.org)
+[![Soroban](https://img.shields.io/badge/Soroban-Smart%20Contracts-FFD700?style=flat-square&logo=rust)](https://soroban.stellar.org)
+[![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
+[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-**IntentRemit** is a programmable remittance layer built on Stellar that allows diaspora senders to attach **goals, conditions, and intelligent allocation** to transfers — helping recipients turn money into structured financial growth instead of immediate consumption.
+**[Live Miniapp](https://paywhen.vercel.app) · [GitHub](https://github.com/BitBand-Labs/PayWhen)**
 
----
-
-## ❗ Problem
-
-Remittances into regions like West Africa exceed **$20B+ annually**, yet:
-
-- 💸 High fees (8%–20%) and slow settlement (3–5 days)
-- 💳 Existing crypto rails solve _speed_, but not _financial behavior_
-- 📉 80–90% of remittances go into immediate consumption
-- 🚫 No structured way to enforce savings, goals, or financial discipline
-
-**Result:**  
-Money flows in — but long-term financial progress remains stagnant.
+</div>
 
 ---
 
-## 💡 Solution
-
-IntentRemit introduces **programmable financial intent** into remittances:
-
-- 📨 Send money with a **goal** (e.g., school fees, rent, business capital)
-- ⚙️ Define **conditional splits** (e.g., 60% now, 40% later)
-- 🧠 Get **AI-powered allocation suggestions**
-- 🔒 Lock funds into a **Growth Vault** (time-locked smart contract)
+> **The Problem:** Payments today are manual, trust-based, and non-conditional. Users rely on verbal agreements, manual follow-ups, and third-party intermediaries — creating friction, disputes, and inefficiency.
+>
+> **The Solution:** PayWhen is an intent-based payment protocol on **Stellar** that allows users to define conditions under which funds are automatically executed on-chain. Instead of sending money immediately, users define rules — and the protocol enforces them using **Soroban smart contracts**.
 
 ---
 
-## 🎯 Core MVP Features (5-Day Build Scope)
+## 🎯 Overview
 
-### 1. ⚡ Instant Stellar Transfer
+PayWhen transforms **user intent** into **enforceable on-chain payment logic** on Stellar:
 
-- Connect wallet (Freighter / Stellar SDK)
-- Send **USDC or XLM** instantly to recipient
+- “Send when delivery is confirmed”
+- “Pay every Friday”
+- “Release funds after milestone completion”
 
----
-
-### 2. 🎯 Goal-Based Remittance
-
-- Sender selects:
-  - School Fees
-  - Rent
-  - Business Capital
-  - Custom goal
-- Optional message/note
+The system holds funds in escrow, monitors conditions, and executes automatically — no intermediaries, no manual intervention.
 
 ---
 
-### 3. 🔐 Conditional Split (Soroban Smart Contract)
+## 🧩 Core Features
 
-- Sender defines rules:
-  - "60% available immediately"
-  - "40% locked until [date]"
-- Smart contract enforces release conditions
+### 1. Conditional Payment Contracts (Soroban)
 
----
+- Create payments with custom conditions
+- Funds locked securely in escrow
+- Automatic execution when conditions are met
+- Refund logic if conditions fail
 
-### 4. 🧠 AI Allocation Suggestion (Lightweight)
+### 2. Supported Conditions
 
-- System suggests optimal split:
+**Time-based**
 
-  > "For school fees, we recommend 55% now, 45% locked."
+- Execute at specific timestamp
+- Recurring payments (weekly/monthly)
 
-- Based on:
-  - Goal type
-  - Region heuristics
-  - Simple rule-based logic (MVP)
+**Manual Trigger**
 
----
+- Recipient confirms delivery
+- Multi-party approval flows
 
-### 5. 📈 Growth Vault
+**Oracle-based** (Phase 2)
 
-- Locked funds go into a **Soroban time-lock contract**
-- Displays:
-  - Locked amount
-  - Unlock date
-  - Simulated growth
+- GPS/location verification
+- API-based external triggers via Soroban oracles
 
-> ⚠️ MVP Note: Yield is simulated  
-> Production path: Stellar liquidity pools / tokenized assets
+### 3. Payment Types
 
----
+- One-time conditional payments
+- Recurring subscriptions
+- Group contributions (threshold unlock)
 
-## 🏗️ Technical Architecture
+### 4. Escrow System
 
-### 🔗 Blockchain Layer
-
-- **Soroban Smart Contracts**
-  - Time-lock / vesting logic
-  - Conditional release rules
-- **Stellar Network**
-  - Fast, low-cost payments
-  - USDC/XLM transfers
+- Funds locked in Soroban smart contracts
+- Timeout-based refunds
+- Optional dispute resolution period
+- Non-custodial — users always control their keys via Stellar wallets
 
 ---
 
-### 🧠 AI Layer
+## 🏗️ Architecture
 
-- Rule-based engine (MVP)
-- Context-aware suggestions
-- Future:
-  - Behavioral learning
-  - Personal financial optimization
+| Layer               | Technology                    | Purpose                                         |
+| ------------------- | ----------------------------- | ----------------------------------------------- |
+| **Smart Contracts** | Soroban (Rust)                | Conditional payments, escrow, logic enforcement |
+| **Frontend**        | Next.js, TypeScript, Tailwind | Mobile-first miniapp UI                         |
+| **Network**         | Stellar (Futurenet/Testnet)   | Fast, low-cost asset transfers                  |
 
----
+### Smart Contracts (Soroban)
 
-### 🖥️ Frontend
+#### `PaymentFactory`
 
-- Next.js (React)
-- TypeScript
-- Tailwind CSS
-- Mobile-first (PWA)
+- Creates new conditional payment contracts
+- Tracks all active payments
+- Manages payment lifecycle
 
----
+#### `ConditionalPayment`
 
-### 🔌 Wallet Integration
-
-- Freighter Wallet
-- Stellar JS SDK
+- Core escrow contract
+- Stores sender, recipient, amount, condition logic
+- Handles execution, refunds, and disputes
 
 ---
 
-### ⚙️ Backend (Minimal)
+## 🎨 Frontend Miniapp
 
-- Node.js (optional)
-- Can be mostly client-side for MVP speed
+Lightweight, mobile-first interface:
 
----
-
-## 🎥 Demo Flow (2-Minute Pitch)
-
-1. Sender connects wallet
-2. Enters recipient address
-3. Selects goal (e.g., school fees)
-4. System suggests allocation (AI)
-5. Sender confirms split (e.g., 60/40)
-6. Sends funds
-7. Recipient receives instantly
-8. Sees:
-   - Available funds
-   - Locked funds in vault
-9. Vault shows growth over time
+- **Create Payment**: Set amount, recipient, condition type
+- **View Status**: Active, pending, completed, refunded
+- **Trigger Execution**: Manual approval or auto-execute
+- **Real-time Updates**: Live contract state via Stellar SDK
 
 ---
 
-## 🚀 Why This Matters
+## 🔐 Security
 
-- 💡 Moves remittances from **consumption → structured growth**
-- ⚡ Uses Stellar's strengths (speed, low fees, asset support)
-- 🔐 Unlocks **programmable money behavior** via Soroban
-- 🌍 High impact for emerging markets
-- ❤️ Emotional + practical value (family, education, survival → growth)
-
----
-
-## 🧩 Future Expansion (Post-MVP)
-
-- Real off-ramp (mobile money / bank integration)
-- Advanced AI financial assistant
-- Multi-user family dashboards
-- Milestone verification (e.g., receipt upload)
-- Yield integration (DeFi / tokenized assets)
-- Cross-border payroll & merchant tools
+- Reentrancy protection
+- Escrow fund safety
+- Condition validation (on-chain verification)
+- Timeout fallback logic (automatic refunds)
+- Auditable on-chain execution (full transparency)
 
 ---
 
-## 📂 Project Structure
-
-```
-IntentRemit/
-├── smartcontract/     # Soroban time-lock & vault contracts
-├── frontend/          # Next.js PWA frontend
-├── docs/             # Development guides & issue trackers
-├── README.md         # This file
-├── STYLE.md          # Code style guidelines
-├── MAINTAINERS.md    # Project maintainers
-├── CONTRIBUTING.md   # Contribution guidelines
-└── CODE_OF_CONDUCT.md # Community code of conduct
-```
-
----
-
-## 🚀 Getting Started
+## 🚀 Development
 
 ### Prerequisites
-- Node.js v18+
+
+- Node.js 18+
 - Rust & Cargo (for Soroban)
 - Freighter Wallet
 
-### Setup Frontend
+### Smart Contracts
+
+```bash
+cd smartcontract
+
+# Build contracts
+cargo build --target wasm32-unknown-unknown --release
+
+# Run tests
+cargo test
+```
+
+### Frontend
+
 ```bash
 cd frontend
+
+# Install dependencies
 npm install
+
+# Run dev server
 npm run dev
 ```
 
-### Setup Smart Contracts
-```bash
-cd smartcontract
-cargo build
-```
+---
+
+## 📊 Success Metrics
+
+- Number of payments created
+- Total transaction volume (USDC/XLM)
+- Unique users
+- Execution success rate
+- Average time-to-execution
 
 ---
 
-## 📚 Documentation & Trackers
+## 🗺️ Roadmap
 
-- 🧠 **[Smart Contract Issues](./docs/ISSUES-SMARTCONTRACT.md)**
-- 🎨 **[Frontend Issues](./docs/ISSUES-FRONTEND.md)**
-- 🤖 **[Backend & AI Issues](./docs/ISSUES-BACKEND-AI.md)**
+### Phase 1 (MVP)
 
-Guides:
-- 📘 **[Smart Contract Guide](./docs/SMARTCONTRACT_GUIDE.md)**
-- 🌐 **[Frontend Integration Guide](./docs/FRONTEND_GUIDE.md)**
+- Time-based payments
+- Manual trigger
+- Simple miniapp UI on Stellar
+- Basic escrow with refunds
+
+### Phase 2
+
+- Oracle integrations
+- Recurring payments
+- Email/SMS notifications
+- Multi-signature approvals
+
+### Phase 3
+
+- SDK for developers
+- API integrations (Zapier, IFTTT)
+- Cross-app triggers
+- Mobile app (Stellar Wallet integration)
 
 ---
 
-## 🤝 Contributing
+## 🔗 Links
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+- [Live Miniapp](https://paywhen.vercel.app/)
+- [GitHub Repository](https://github.com/BitBand-Labs/PayWhen)
 
 ---
 
-*Project maintained by @bbkenny.*
+### 🤝 Contributing
+
+Pull requests welcome! Please ensure:
+
+- All tests pass
+- Code follows existing style
+- New features include tests
+- Security best practices followed
+
+### 📄 License
+
+MIT © PayWhen Protocol
