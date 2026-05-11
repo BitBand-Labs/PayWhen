@@ -1,6 +1,6 @@
-# Code Style Guide - IntentRemit
+# Code Style Guide - PayWhen
 
-## JavaScript / TypeScript (Frontend & Backend)
+## JavaScript / TypeScript (Frontend)
 
 - **Formatting:** Use Prettier with standard config
 - **Linting:** ESLint with recommended rules
@@ -10,13 +10,14 @@
 - **Async:** Use async/await, handle errors properly
 - **Types:** Always define interfaces for data structures
 
-## Rust (Soroban Contracts)
+## Rust (Soroban Smart Contracts)
 
 - **Formatting:** Always run `cargo fmt`
+- **Version:** Always use latest Soroban SDK
 - **Errors:** Use `Result<T, E>` for error handling
-- **Safety:** Always use the `Env` object for authorization
-- **Time Handling:** Be careful with timestamp comparisons for vault locks
-- **Testing:** Write unit tests for each function
+- **Safety:** Always use the `Env` object for authorization and state access
+- **Logic:** Keep logic clean, separate concerns between factory and implementation
+- **Testing:** Write comprehensive unit tests in `test.rs` for every contract function
 
 ## Project Conventions
 
@@ -34,9 +35,9 @@
 ## Integrity Checks
 
 - **Frontend:** `npm run build` before pushing
-- **Contracts:** `cargo build --all` before starting work
+- **Contracts:** `cargo build --target wasm32-unknown-unknown --release` before starting work
 - **Typecheck:** `npm run typecheck` if available
 
 ---
 
-*Always ensure the workspace is clean and compiles correctly.*
+*Always ensure the workspace is clean and compiles correctly on Stellar.*
