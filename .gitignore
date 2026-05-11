@@ -1,20 +1,14 @@
-# OS
-.DS_Store
-.DS_Store?
-Thumbs.db
-ehthumbs.db
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Logs
+node_modules/
+.next/
+out/
+dist/
+build/
+.env
+.env.local
+.env.*.local
 *.log
-logs/
-
-# Temporary / generated docs
-doc-sync-report.md
-audit-report.md
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+*.pem
