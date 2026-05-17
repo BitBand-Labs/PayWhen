@@ -87,7 +87,7 @@ export default function HeroIllustration() {
           <span className="label">Multi-Chain</span>
         </div>
         <div style={{ color: "var(--foreground)", fontWeight: 700, fontSize: 13, lineHeight: 1.4 }}>
-          Deploy on Celo and EVM chains
+          Deploy on Stellar & Soroban
         </div>
       </motion.div>
     </div>
