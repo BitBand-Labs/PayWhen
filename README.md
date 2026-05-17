@@ -1,4 +1,4 @@
-# PayWhen 🕒💸
+# PayWhen
 
 ![PayWhen Banner](https://placehold.co/1200x400/8FA828/ffffff/png?text=PayWhen+Conditional+Payments)
 

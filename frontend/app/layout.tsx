@@ -3,8 +3,8 @@ import "./globals.css";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "XHedge",
-  description: "Stablecoin Volatility Shield for Weak Currencies",
+  title: "PayWhen",
+  description: "Intent-Based Conditional Payments on Stellar",
 };
 
 export default function RootLayout({

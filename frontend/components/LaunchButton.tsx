@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useAccount } from "wagmi";
+import { useWallet } from "@/lib/hooks";
 import { useToast } from "@/components/Toast";
 import { Zap } from "lucide-react";
 
 export default function LaunchButton() {
-  const { isConnected } = useAccount();
+  const { address } = useWallet();
+  const isConnected = !!address;
   const { showToast } = useToast();
 
   return (
