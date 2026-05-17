@@ -1,9 +1,0 @@
-[profile.default]
-src = "contracts"
-test = "test"
-out = "out"
-libs = ["lib"]
-remappings = [
-    "@openzeppelin/contracts/=lib/openzeppelin-contracts/",
-    "forge-std/=lib/forge-std/src/"
-]

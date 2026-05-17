@@ -1,12 +1,16 @@
-[workspace]
-resolver = "2"
+[package]
+name = "paywhen-contract"
+version = "0.1.0"
+edition = "2021"
 
-members = [
-    "contracts/volatility_shield",
-]
-
-[workspace.dependencies]
+[dependencies]
 soroban-sdk = "20.0.0"
+
+[dev_dependencies]
+soroban-sdk = { version = "20.0.0", features = ["testutils"] }
+
+[lib]
+crate-type = ["cdylib", "rlib"]
 
 [profile.release]
 opt-level = "z"
