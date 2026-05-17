@@ -1,6 +1,6 @@
-# Frontend Issues - IntentRemit 🎨
+# Frontend Issues - PayWhen 🎨
 
-This document tracks the detailed UI/UX and integration tasks for the IntentRemit dashboard.
+This document tracks the detailed UI/UX and integration tasks for the PayWhen miniapp.
 
 ---
 
@@ -10,146 +10,89 @@ This document tracks the detailed UI/UX and integration tasks for the IntentRemi
 **Category:** `[UI]`
 **Status:** ❌ PENDING
 **Priority:** Critical
-**Description:** Initialize Next.js app with IntentRemit branding.
+**Description:** Initialize Next.js app with PayWhen branding.
 - **Tasks:**
-  - [ ] Configure `tailwind.config.ts` (Warm, trustworthy theme).
-  - [ ] Setup `globals.css` colors (Green/gold accents for growth).
+  - [ ] Configure `tailwind.config.ts`.
+  - [ ] Setup `globals.css` colors.
   - [ ] Implement `Layout` with header and navigation.
 
-### Issue #FE-2: Freighter Wallet Integration
+### Issue #FE-2: Wallet Integration
 **Category:** `[INTEGRATION]`
 **Status:** ❌ PENDING
 **Priority:** Critical
 **Description:** Global wallet state management.
 - **Tasks:**
-  - [ ] Create `FreighterContext`.
-  - [ ] Implement connection logic.
+  - [ ] Create wallet connection hooks.
+  - [ ] Implement Freighter connection logic.
   - [ ] Auto-reconnect on refresh.
   - [ ] Display connected wallet address.
 
 ---
 
-## 💸 Phase 2: Send Flow
+## 💸 Phase 2: Create Payment Flow
 
-### Issue #FE-3: Recipient Input
+### Issue #FE-3: Escrow Setup
 **Category:** `[UI]`
 **Status:** ❌ PENDING
 **Priority:** High
-**Description:** Enter recipient Stellar address.
+**Description:** Enter recipient, amount, and condition.
 - **Tasks:**
   - [ ] Input field for recipient address.
-  - [ ] Address validation (Stellar format).
-  - [ ] Optional: Address book / recent recipients.
-
-### Issue #FE-4: Goal Selection
-**Category:** `[UI]`
-**Status:** ❌ PENDING
-**Priority:** High
-**Description:** Select the purpose of the remittance.
-- **Tasks:**
-  - [ ] Goal selector: School Fees, Rent, Business Capital, Custom.
-  - [ ] Display icon/image for each goal.
-  - [ ] Optional note/message field.
-
-### Issue #FE-5: Amount Input
-**Category:** `[UI]`
-**Status:** ❌ PENDING
-**Priority:** High
-**Description:** Enter transfer amount.
-- **Tasks:**
   - [ ] Amount input (USDC or XLM).
-  - [ ] Currency toggle.
-  - [ ] Display equivalent in both assets.
-  - [ ] Show estimated fees.
+  - [ ] Condition selector (Time-based, Manual, Oracle).
+  - [ ] Dynamic fields based on condition type (e.g. Datepicker for Time-based).
 
-### Issue #FE-6: AI Allocation Suggestion
-**Category:** `[UI/INTEGRATION]`
-**Status:** ❌ PENDING
-**Priority:** High
-**Description:** Display AI-suggested split.
-- **Tasks:**
-  - [ ] Call suggestion API based on goal type.
-  - [ ] Display suggestion: "55% now, 45% locked"
-  - [ ] Accept/Modify buttons.
-  - [ ] Custom split input option.
-
----
-
-## 🔐 Phase 3: Vault Configuration
-
-### Issue #FE-7: Conditional Split Setup
+### Issue #FE-4: Transaction Review
 **Category:** `[UI]`
 **Status:** ❌ PENDING
 **Priority:** High
-**Description:** Configure immediate vs locked amounts.
+**Description:** Review and confirm the conditional payment.
 - **Tasks:**
-  - [ ] Slider or input for split percentage.
-  - [ ] Real-time calculation of amounts.
-  - [ ] Display: "X available now, Y locked"
-
-### Issue #FE-8: Lock Duration
-**Category:** `[UI]`
-**Status:** ❌ PENDING
-**Priority:** High
-- **Tasks:**
-  - [ ] Date picker for unlock time.
-  - [ ] Preset options (1 week, 1 month, 3 months, custom).
-  - [ ] Display countdown visualization.
-
-### Issue #FE-9: Transaction Review
-**Category:** `[UI]`
-**Status:** ❌ PENDING
-**Priority:** High
-- **Tasks:**
-  - [ ] Summary of all settings.
-  - [ ] "Send" button with confirmation.
+  - [ ] Summary of all escrow settings.
+  - [ ] "Lock Funds" button with wallet confirmation.
   - [ ] Transaction toast notifications.
 
 ---
 
-## 📊 Phase 4: Recipient Dashboard
+## 🔐 Phase 3: Escrow Management
 
-### Issue #FE-10: Available Balance
+### Issue #FE-5: Active Escrows Dashboard
 **Category:** `[UI]`
 **Status:** ❌ PENDING
 **Priority:** High
+**Description:** View payments created and payments received.
 - **Tasks:**
-  - [ ] Display immediately available funds.
-  - [ ] "Withdraw" button (simulated for MVP).
+  - [ ] Tabbed view: "Sent" and "Received".
+  - [ ] List active, pending, completed, and refunded escrows.
+  - [ ] Visual indicators for condition met/unmet.
 
-### Issue #FE-11: Growth Vault Display
+### Issue #FE-6: Execution Triggers
 **Category:** `[UI]`
 **Status:** ❌ PENDING
+**Priority:** High
+**Description:** Allow triggering of the escrow if condition is met.
 - **Tasks:**
-  - [ ] Show locked amount.
-  - [ ] Show unlock date / countdown.
-  - [ ] Display "simulated growth" (MVP).
-  - [ ] Visual vault representation.
-
-### Issue #FE-12: Transaction History
-**Category:** `[UI]`
-**Status:** ❌ PENDING
-- **Tasks:**
-  - [ ] List of received transfers.
-  - [ ] Show goal, amount, lock status.
-  - [ ] Filter by status (available/locked).
+  - [ ] "Execute Payment" button for met conditions.
+  - [ ] "Request Refund" button if dispute timeout reached.
+  - [ ] Wallet signature handling for manual trigger.
 
 ---
 
-## 🧪 Phase 5: Testing & Polish
+## 🧪 Phase 4: Testing & Polish
 
-### Issue #FE-13: Error Handling
+### Issue #FE-7: Error Handling
 **Category:** `[ERROR]`
 **Status:** ❌ PENDING
 - **Tasks:**
   - [ ] Handle wallet not installed.
   - [ ] Handle invalid address.
   - [ ] Handle insufficient balance.
-  - [ ] Handle network errors.
+  - [ ] Handle smart contract simulation errors.
 
-### Issue #FE-14: Responsive Design
+### Issue #FE-8: Responsive Design
 **Category:** `[UI]`
 **Status:** ❌ PENDING
-- [ ] Test on mobile devices.
-- [ ] Optimize for small screens.
-- [ ] PWA manifest setup.
+- **Tasks:**
+  - [ ] Test on mobile devices (miniapp focus).
+  - [ ] Optimize for small screens.
+  - [ ] PWA manifest setup.

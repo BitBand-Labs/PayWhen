@@ -1,85 +1,77 @@
-# Smart Contract Issues - IntentRemit 🔐
+# Smart Contract Issues - PayWhen 🔐
 
-This document tracks the detailed development tasks for IntentRemit Soroban smart contracts.
+This document tracks the detailed development tasks for PayWhen Soroban smart contracts.
 
 ---
 
-## 🏛️ Core Vault Architecture
+## 🏛️ Core Escrow Architecture
 
-### Issue #SC-1: Growth Vault Initialization
+### Issue #SC-1: Conditional Payment Initialization
 **Priority:** Critical
 **Status:** ❌ PENDING
-**Description:** Initialize the Growth Vault contract structure for time-locked funds.
+**Description:** Initialize the core escrow contract for conditional payments.
 - **Tasks:**
-  - [ ] Initialize `growth_vault` project.
-  - [ ] Define `DataKey` enum: `Owner`, `LockedAmount`, `UnlockTime`, `Goal`.
-  - [ ] Implement `init(env, owner: Address, unlock_time: u64)` function.
-  - [ ] Store the goal type (school fees, rent, business, etc.).
+  - [ ] Initialize `conditional_payment` project.
+  - [ ] Define `DataKey` enum: `Sender`, `Recipient`, `Amount`, `ConditionType`, `ConditionData`, `DisputeTimeout`.
+  - [ ] Implement `create_escrow(env, sender, recipient, amount, condition_type, condition_data)` function.
 
 ### Issue #SC-2: Deposit & Lock Logic
 **Priority:** Critical
 **Status:** ❌ PENDING
-**Description:** Accept funds and lock them until unlock time.
+**Description:** Accept funds into the contract and lock them.
 - **Tasks:**
-  - [ ] Implement `deposit(env, from: Address, amount: i128)`.
-  - [ ] Implement `lock_funds(env, amount: i128, unlock_time: u64)`.
-  - [ ] Store locked amount separately from available balance.
-  - [ ] Emit `Deposit` and `Lock` events.
+  - [ ] Implement token transfer from `Sender` to the contract.
+  - [ ] Store escrow state securely.
+  - [ ] Emit `EscrowCreated` event.
 
-### Issue #SC-3: Conditional Release
+### Issue #SC-3: Condition Execution
 **Priority:** Critical
 **Status:** ❌ PENDING
-**Description:** Enforce split rules (e.g., 60% now, 40% later).
+**Description:** Enforce execution only when conditions are met.
 - **Tasks:**
-  - [ ] Implement `set_release_schedule(env, immediate_pct: u32, locked_pct: u32)`.
-  - [ ] Calculate immediate vs locked amounts on deposit.
-  - [ ] Only allow locked funds to be withdrawn after unlock time.
+  - [ ] Implement `execute(env, escrow_id)` function.
+  - [ ] Check if `condition_type == Time` and `unlock_time` has passed.
+  - [ ] Check if `condition_type == Manual` and the authorized party signed.
+  - [ ] Transfer funds to `Recipient`.
+  - [ ] Emit `EscrowExecuted` event.
 
 ---
 
-## ⚙️ Goal Management
+## ⚙️ Fallback & Refunds
 
-### Issue #SC-4: Goal Tracking
+### Issue #SC-4: Dispute and Refund Timeout
 **Priority:** High
 **Status:** ❌ PENDING
-**Description:** Track the purpose of each remittance.
+**Description:** Ensure senders can retrieve funds if a condition is never met.
 - **Tasks:**
-  - [ ] Define `Goal` enum: `SchoolFees`, `Rent`, `BusinessCapital`, `Custom`.
-  - [ ] Store goal metadata with vault.
-  - [ ] Query function: `get_goal(env) -> Goal`.
-
-### Issue #SC-5: Multiple Vaults (Future)
-**Priority:** Medium
-**Status:** ❌ PENDING
-**Description:** Support multiple locked portions for different goals.
-- **Tasks:**
-  - [ ] Implement vault registry.
-  - [ ] Track multiple unlock times.
-  - [ ] Query: `get_vaults(env, owner: Address) -> Vec<Vault>`.
+  - [ ] Store `dispute_timeout` upon creation.
+  - [ ] Implement `refund(env, escrow_id)`.
+  - [ ] Time-check: refund only available after `dispute_timeout`.
+  - [ ] Transfer funds back to `Sender`.
 
 ---
 
 ## 🔒 Access Control
 
-### Issue #SC-6: Owner-Only Withdrawals
+### Issue #SC-5: Trigger Authorization
 **Priority:** High
 **Status:** ❌ PENDING
-**Description:** Only the vault owner can withdraw funds.
+**Description:** Only authorized parties can trigger executions.
 - **Tasks:**
   - [ ] Implement authorization check using Soroban Auth.
-  - [ ] Only owner can call `withdraw`.
-  - [ ] Time-check: locked funds only available after unlock_time.
+  - [ ] For `Manual` triggers, ensure caller matches the authorized recipient/arbiter.
+  - [ ] Ensure `execute` can't be called twice.
 
 ---
 
 ## 🧪 Testing
 
-### Issue #SC-7: Time-Lock Tests
+### Issue #SC-6: Condition Logic Tests
 **Priority:** High
 **Status:** ❌ PENDING
-**Description:** Verify time-lock behavior.
+**Description:** Verify escrow lock and release behavior.
 - **Tasks:**
   - [ ] Test deposit and lock.
-  - [ ] Test early withdrawal fails.
-  - [ ] Test successful withdrawal after unlock time.
-  - [ ] Test conditional split calculation.
+  - [ ] Test early execution fails.
+  - [ ] Test successful execution after time passes.
+  - [ ] Test refund after dispute timeout.

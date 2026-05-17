@@ -6,10 +6,9 @@
 
 ## 🧠 Overview
 
-PayWhen is an intent-based payment protocol on **Stellar** that allows users to define conditions under which funds are automatically executed on-chain.
+**PayWhen** is an intent-based payment protocol on the **Stellar Network** that shifts the paradigm of payments from simply "sending money immediately" to "defining behavior that money follows." 
 
-Instead of sending money immediately, users define rules such as:
-
+It allows users to define conditions under which funds are automatically executed on-chain. Instead of sending money manually, users define rules such as:
 - “Send when delivery is confirmed”
 - “Pay every Friday”
 - “Release funds after milestone completion”
@@ -20,164 +19,128 @@ The system converts user intent into enforceable on-chain payment logic using **
 
 ## 🎯 Problem Statement
 
-Payments today are:
+Payments today are fundamentally flawed for complex transactions:
+1. **Manual & Inefficient**: Sending recurring or milestone-based payments requires calendar reminders and manual intervention.
+2. **Trust-Based**: Buying services online requires either trusting the seller (paying upfront) or trusting the buyer (delivering upfront).
+3. **Non-Conditional**: Once money is sent, it's gone. There is no programmable fallback if agreements aren't met.
 
-- Manual
-- Trust-based
-- Non-conditional
-
-Users often rely on:
-
-- Verbal agreements, manual follow-ups, and third-party intermediaries — creating friction, disputes, and inefficiency.
+Users often rely on third-party escrow services that charge massive fees, or they fall victim to scams and disputes.
 
 ---
 
-## 💡 Solution
+## 💡 The PayWhen Solution
 
-Enable programmable payments based on conditions on the Stellar network.
+Enable programmable payments based on strictly defined conditions using the speed and low cost of Stellar.
 
 Users define:
-
-- Recipient
-- Amount
-- Trigger condition
+- **Recipient**: The destination address.
+- **Amount**: How much USDC or XLM.
+- **Trigger Condition**: Time, Manual Approval, or Oracle Data.
 
 The protocol:
-
-- Holds funds in escrow (Soroban contract)
-- Monitors condition
-- Executes payment automatically
-
----
-
-## 🧩 Core Features
-
-### 1. Conditional Payment Contracts (Soroban)
-
-- Create payment with condition
-- Funds locked in escrow
-- Executes when condition is met
-
----
-
-### 2. Supported Conditions (MVP)
-
-#### Time-based
-
-- Execute at timestamp
-- Recurring payments (weekly/monthly)
-
-#### Manual Trigger (trusted party)
-
-- Recipient confirms delivery
-- Multi-party approval
-
-#### Oracle-based (Phase 2)
-
-- GPS/location verification
-- API-based triggers (via Soroban-compatible oracles)
-
----
-
-### 3. Payment Types
-
-- One-time conditional payments
-- Recurring subscriptions
-- Group contributions (threshold unlock)
-
----
-
-### 4. Escrow System
-
-- Funds locked in Soroban smart contract
-- Refund logic if condition fails
-- Optional dispute timeout
-
----
-
-## 🔁 User Flow
-
-1. User selects “Create Payment”
-2. Inputs:
-   - Amount
-   - Recipient
-   - Condition
-3. Funds are deposited into Soroban contract
-4. Condition monitored
-5. Payment executes automatically on Stellar
+1. Holds the funds safely in an **Escrow Smart Contract**.
+2. Monitors the trigger condition passively or actively.
+3. **Executes** the payment automatically when met, OR **Refunds** the sender if a dispute timeout is reached.
 
 ---
 
 ## 🏗️ Architecture
 
-### Smart Contracts (Soroban)
+```mermaid
+graph TD
+    User((User)) -->|Create Conditional Payment| UI[PayWhen Miniapp]
+    UI -->|Invoke create_escrow| Contract[Soroban Escrow Contract]
+    
+    subgraph Conditions
+        Time[Time-based Unlock]
+        Manual[Manual Authorization]
+        Oracle[API Webhook/Oracle]
+    end
 
-- `PaymentFactory`
-  - Creates new payment contracts
-
-- `ConditionalPayment`
-  - Stores:
-    - Sender
-    - Recipient
-    - Amount
-    - Condition logic
+    Contract -->|Monitors| Conditions
+    
+    Conditions -->|Condition Met| Exec[Execute Payment]
+    Conditions -->|Timeout Reached| Refund[Refund Sender]
+    
+    Exec -->|Transfer| Recipient((Recipient))
+    Refund -->|Transfer| User
+```
 
 ---
 
-### Frontend
+## 🧩 Core Features (MVP to Phase 3)
 
-- Next.js + TypeScript
-- Wallet connection (Freighter Wallet / Stellar SDK)
-- Mobile-first UI
+### 1. Conditional Escrow Contracts (Soroban)
+- Creates discrete escrows for every transaction.
+- Non-custodial: funds are locked by code, not a centralized entity.
+
+### 2. Supported Conditions
+**Phase 1: Time & Trust**
+- **Time-based**: Execute exactly at a Unix timestamp.
+- **Manual Trigger**: The designated arbiter or recipient must cryptographically sign to release funds.
+
+**Phase 2: Oracles**
+- **API Triggers**: Off-chain Node.js oracles that listen to webhooks (e.g., FedEx delivery confirmation, Zapier integration) and trigger the contract.
+- **Location Verification**: GPS-based releases for local transactions.
+
+### 3. Automated Refunds
+- Every escrow has a `dispute_timeout`.
+- If the condition is never met, the sender can retrieve their funds effortlessly.
 
 ---
 
-## 🔐 Security Considerations
+## 🔁 User Flow
 
-- Reentrancy protection
-- Escrow fund safety
-- Condition validation
-- Timeout fallback logic
+### Flow A: Creating an Escrow
+1. User connects Freighter wallet to PayWhen Miniapp.
+2. Clicks **"New Payment"**.
+3. Inputs Recipient Address, Amount (100 USDC), and Condition (e.g., "Manual Approval").
+4. User signs the transaction. Funds are deducted and locked in the Soroban contract.
+
+### Flow B: Triggering Execution
+1. The Arbiter/Recipient logs into PayWhen.
+2. Navigates to the **"Active Escrows"** dashboard.
+3. Finds the pending payment and clicks **"Confirm Condition Met"**.
+4. Signs the transaction. The smart contract releases the 100 USDC to the Recipient.
+
+---
+
+## 🔐 Security Model
+
+- **No Centralized Custody**: PayWhen developers cannot access locked funds.
+- **Soroban Auth Framework**: Strict checks ensure only the defined trigger authority can execute a contract.
+- **Reentrancy Protection**: Follows Checks-Effects-Interactions patterns in Rust.
+- **Timeout Safety Net**: Funds can never be permanently frozen; the sender can always trigger a refund after the `dispute_timeout`.
 
 ---
 
 ## 📊 Success Metrics
 
-- Number of payments created
-- Total transaction volume (USDC/XLM)
-- Unique users
-- Execution success rate
+- **Total Value Locked (TVL)**: Amount of USDC/XLM actively in escrow.
+- **Execution Rate**: Percentage of escrows successfully executed vs refunded.
+- **Active Users**: Number of unique wallet connections per month.
+- **Transaction Volume**: Total dollar value processed by the protocol.
 
 ---
 
 ## 🚀 Roadmap
 
-### Phase 1 (MVP)
+### Phase 1: MVP (Current)
+- Basic Soroban `ConditionalPayment` contract.
+- Time-based and Manual conditions.
+- Next.js Miniapp Dashboard (Send/Receive tabs).
 
-- Time-based payments
-- Manual trigger
-- Simple UI on Stellar
+### Phase 2: Automation & Oracles
+- Backend Oracle Node for API webhooks.
+- Email/SMS notifications for escrow events.
+- Recurring subscription payments.
 
-### Phase 2
-
-- Oracle integrations
-- Recurring payments
-- Notifications
-
-### Phase 3
-
-- SDK for developers
-- API integrations
-- Cross-app triggers
+### Phase 3: Developer Ecosystem
+- PayWhen SDK for third-party dApps.
+- Multi-signature approvals.
+- Integration with Stellar fiat off-ramps (MoneyGram).
 
 ---
 
 ## 🎯 Positioning
-
-A mobile-first payment protocol that transforms user intent into automated financial execution on the Stellar network.
-
----
-
-## 🧠 Key Differentiator
-
-Not just sending money — but defining behavior that money follows.
+**PayWhen** is the programmable financial layer for Stellar—turning intent into automated, trustless execution.

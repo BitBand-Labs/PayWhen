@@ -73,55 +73,17 @@ export function useFreighter() {
 
 ---
 
-## 4. Sending Payments (IntentRemit) 💸
+## 4. Simple Payments vs. Conditional Payments 💸
 
-IntentRemit sends USDC/XLM with programmable goals and conditional splits.
+While standard Stellar payments happen instantly, PayWhen uses Soroban to lock funds until conditions are met. 
 
-```typescript
-import { 
-  Keypair, 
-  TransactionBuilder, 
-  Asset, 
-  Operation,
-  TimeoutInfinite 
-} from "@stellar/stellar-sdk";
-
-const HORIZON_URL = "https://horizon-testnet.stellar.org";
-
-async function sendWithGoal(
-  senderKeypair: Keypair,
-  recipientAddress: string,
-  amount: string,
-  goal: string
-) {
-  const server = new Server(HORIZON_URL);
-  const account = await server.loadAccount(senderKeypair.publicKey());
-  
-  const transaction = new TransactionBuilder(account, {
-    fee: "100",
-    networkPassphrase: "Test SDF Network ; September 2015"
-  })
-  .addOperation(Operation.payment({
-    destination: recipientAddress,
-    asset: Asset.native(), // or USDC
-    amount: amount
-  }))
-  .setTimeout(TimeoutInfinite)
-  .build();
-
-  // Sign and submit
-  transaction.sign(senderKeypair);
-  const result = await server.submitTransaction(transaction);
-  
-  return result;
-}
-```
+To create a conditional payment, we interact with the `ConditionalPayment` contract instead of using the standard `Operation.payment()`.
 
 ---
 
-## 5. Interacting with Growth Vaults 📦
+## 5. Creating a Conditional Payment 📦
 
-Call the Soroban contract to create a time-locked vault.
+Call the Soroban contract to create a time-locked or manual-trigger escrow.
 
 ```typescript
 import { 
@@ -132,31 +94,36 @@ import {
 } from "@stellar/stellar-sdk";
 import { signTransaction } from "@stellar/freighter-api";
 
-const VAULT_CONTRACT_ID = "C...";
+const ESCROW_CONTRACT_ID = "C...";
 const RPC_URL = "https://soroban-testnet.stellar.org";
 const NETWORK_PASSPHRASE = "Test SDF Network ; September 2015";
 
-async function createGrowthVault(
-  userAddress: string,
-  lockedAmount: number,
-  unlockTime: number,
-  goal: string
+async function createConditionalPayment(
+  senderAddress: string,
+  recipientAddress: string,
+  amount: number,
+  conditionType: string,
+  unlockTime: number
 ) {
   const server = new SorobanRpc.Server(RPC_URL);
-  const account = await server.getAccount(userAddress);
+  const account = await server.getAccount(senderAddress);
   
-  const contract = new Contract(VAULT_CONTRACT_ID);
+  const contract = new Contract(ESCROW_CONTRACT_ID);
   
   // Encode parameters
+  const senderArg = xdr.ScVal.scvAddress(senderAddress);
+  const recipientArg = xdr.ScVal.scvAddress(recipientAddress);
+  const amountArg = xdr.ScVal.scvI128(amount);
+  const conditionArg = xdr.ScVal.scvSymbol(conditionType);
   const unlockTimeArg = xdr.ScVal.scvU64(unlockTime);
-  const amountArg = xdr.ScVal.scvI128(lockedAmount);
-  const goalArg = xdr.ScVal.scvSymbol(goal);
   
   const tx = new TransactionBuilder(account, { 
     fee: "100", 
     networkPassphrase: NETWORK_PASSPHRASE 
   })
-  .addOperation(contract.call("create_vault", [amountArg, unlockTimeArg, goalArg]))
+  .addOperation(contract.call("create_escrow", [
+      senderArg, recipientArg, amountArg, conditionArg, unlockTimeArg
+  ]))
   .setTimeout(TimeoutInfinite)
   .build();
 
@@ -180,33 +147,35 @@ async function createGrowthVault(
 
 ---
 
-## 6. Querying Vault Status 📊
+## 6. Querying Escrow Status 📊
 
-Read the vault to display locked amount and unlock countdown.
+Read the contract to display the locked amount and trigger status.
 
 ```typescript
-async function getVaultStatus(vaultId: string) {
+async function getEscrowStatus(escrowId: string) {
   const server = new SorobanRpc.Server(RPC_URL);
-  const contract = new Contract(VAULT_CONTRACT_ID);
+  const contract = new Contract(ESCROW_CONTRACT_ID);
 
   const tx = new TransactionBuilder(
     new Account("G...", "0"), 
     { fee: "100", networkPassphrase: NETWORK_PASSPHRASE }
   )
-  .addOperation(contract.call("get_vault_status", [
-    xdr.ScVal.scvAddress(vaultId)
+  .addOperation(contract.call("get_status", [
+    xdr.ScVal.scvAddress(escrowId)
   ]))
   .build();
 
   const sim = await server.simulateTransaction(tx);
   
   if (SorobanRpc.isSimulationSuccess(sim)) {
-    // Parse result to get locked_amount, unlock_time, goal
+    // Parse result
     const result = sim.result.retval;
     return {
-      lockedAmount: result[0].i128(),
-      unlockTime: result[1].u64(),
-      goal: result[2].sym()
+      sender: result[0].address().toString(),
+      recipient: result[1].address().toString(),
+      amount: result[2].i128(),
+      condition: result[3].sym(),
+      unlockTime: result[4].u64()
     };
   }
 }
@@ -214,50 +183,15 @@ async function getVaultStatus(vaultId: string) {
 
 ---
 
-## 7. AI Allocation Suggestions 🧠
+## 7. Triggering Execution / Refund ⚡
 
-IntentRemit uses rule-based AI to suggest optimal splits.
+Once a condition is met (e.g., time has passed), anyone (or the authorized recipient) can trigger the `execute` function.
 
 ```typescript
-type Goal = "SchoolFees" | "Rent" | "BusinessCapital" | "Custom";
-
-interface AllocationSuggestion {
-  immediatePercent: number;
-  lockedPercent: number;
-  reasoning: string;
+async function executePayment(escrowId: string) {
+  // Similar to the transaction builder above, 
+  // but call contract.call("execute", [escrowIdArg])
 }
-
-function getAllocationSuggestion(goal: Goal, amount: number): AllocationSuggestion {
-  const suggestions: Record<Goal, AllocationSuggestion> = {
-    SchoolFees: { 
-      immediatePercent: 55, 
-      lockedPercent: 45, 
-      reasoning: "Keep portion locked for semester continuity" 
-    },
-    Rent: { 
-      immediatePercent: 70, 
-      lockedPercent: 30, 
-      reasoning: "Priority to immediate rent payment" 
-    },
-    BusinessCapital: { 
-      immediatePercent: 50, 
-      lockedPercent: 50, 
-      reasoning: "Balance immediate needs with growth capital" 
-    },
-    Custom: { 
-      immediatePercent: 60, 
-      lockedPercent: 40, 
-      reasoning: "Default split for flexibility" 
-    }
-  };
-  
-  return suggestions[goal];
-}
-
-// Usage
-const suggestion = getAllocationSuggestion("SchoolFees", 1000);
-console.log(`${suggestion.immediatePercent}% now, ${suggestion.lockedPercent}% locked`);
-// Output: 55% now, 45% locked
 ```
 
 ---
@@ -267,9 +201,9 @@ console.log(`${suggestion.immediatePercent}% now, ${suggestion.lockedPercent}% l
 - [ ] **Network Config:** Ensure your app points to the right RPC (Testnet vs Mainnet).
 - [ ] **Passphrase:** Use the correct Network Passphrase.
 - [ ] **Simulation:** ALWAYS simulate before asking the user to sign. It catches errors early and calculates gas.
-- [ ] **XDR:** Familiarize yourself with Stellar's data format (XDR) if you aren't using generated bindings.
-- [ ] **Vault Security:** Verify unlock time hasn't passed before allowing withdrawal.
+- [ ] **XDR:** Familiarize yourself with Stellar's data format (XDR).
+- [ ] **Escrow Security:** Ensure the UI clearly shows the conditions to users before they lock funds.
 
 ---
 
-*Ready to build the future of programmable remittances? 🚀*
+*Ready to build the future of intent-based payments? 🚀*

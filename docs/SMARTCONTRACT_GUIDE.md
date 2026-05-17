@@ -157,38 +157,44 @@ Run it with `cargo test`.
 
 ---
 
-## 8. IntentRemit-Specific Notes 📦🚀
+## 8. PayWhen-Specific Notes 📦🚀
 
-IntentRemit uses Soroban for time-locked Growth Vaults. Key patterns:
+PayWhen uses Soroban to lock funds in conditional escrows. Key patterns:
 
-- **Time-Lock:** Store `unlock_time` as u64 timestamp
-- **Conditional Release:** Calculate `immediate_amount = total * immediate_pct / 100`
-- **Goal Tracking:** Store goal type as Symbol for categorization
-- **Authorization:** Only vault owner can withdraw after unlock time
+- **Condition Storage:** Store the `condition_type` (Time, Manual, Oracle) and corresponding condition data.
+- **Time-Lock:** For time-based conditions, store `unlock_time` as a `u64` timestamp.
+- **Refund Fallback:** Store a `dispute_timeout` so funds return to the sender if conditions are never met.
+- **Authorization:** Only the designated trigger (e.g., recipient for manual confirmation, or the Oracle address) can execute the release.
 
-### Example: Growth Vault Contract Structure
+### Example: Conditional Payment Contract Structure
 
 ```rust
 #[contract]
-pub struct GrowthVault;
+pub struct ConditionalPayment;
 
 #[contractimpl]
-impl GrowthVault {
-    pub fn create_vault(
+impl ConditionalPayment {
+    pub fn create_escrow(
         env: Env,
-        owner: Address,
-        locked_amount: i128,
-        unlock_time: u64,
-        goal: Symbol
+        sender: Address,
+        recipient: Address,
+        amount: i128,
+        condition_type: Symbol,
+        unlock_time: u64
     ) -> Address {
-        // Store vault data
-        // Return vault ID
+        // Store escrow data, sender, recipient, amount, condition
+        // Return escrow ID
     }
     
-    pub fn withdraw(env: Env, vault_id: Address) {
-        // Check unlock_time has passed
-        // Check caller is owner
-        // Transfer funds
+    pub fn execute(env: Env, escrow_id: Address) {
+        // Check if condition is met (e.g. unlock_time has passed)
+        // Check caller has authorization if manual trigger
+        // Transfer funds from contract to recipient
+    }
+    
+    pub fn refund(env: Env, escrow_id: Address) {
+        // Check if condition failed or timeout reached
+        // Refund sender
     }
 }
 ```
